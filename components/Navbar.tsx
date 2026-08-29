@@ -63,10 +63,10 @@ const Navbar: React.FC<Props> = ({
   return (
     <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
       {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-3 sm:gap-4 h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 h-16">
           {/* Logo & Platform Title */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 mr-3 sm:mr-5">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 mr-1 xl:mr-3">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/25 ring-2 ring-indigo-500/20 shrink-0 relative group">
               <TrendingUp size={20} className="stroke-[2.4] transition-transform group-hover:scale-105" />
               <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
@@ -84,7 +84,7 @@ const Navbar: React.FC<Props> = ({
           </div>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-0.5 xl:space-x-1 shrink-0">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -93,14 +93,14 @@ const Navbar: React.FC<Props> = ({
                   key={item.id}
                   id={`nav-tab-${item.id}`}
                   onClick={() => setActiveTab(item.id)}
-                  className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                  className={`relative flex items-center gap-1.5 xl:gap-2 px-2 xl:px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     isActive
                       ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <Icon size={16} className={isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'} />
-                  <span>{item.label}</span>
+                  <Icon size={15} className={`shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`} />
+                  <span className="whitespace-nowrap">{item.label}</span>
                   {item.badge && (
                     <span className="text-[9px] px-1 py-0.2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded font-extrabold uppercase">
                       {item.badge}
@@ -115,17 +115,17 @@ const Navbar: React.FC<Props> = ({
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Smart Natural Words Entry Button */}
             {onOpenSmartEntry && (
               <button
                 id="btn-smart-entry-nav"
                 onClick={onOpenSmartEntry}
-                className="h-9 px-3 sm:px-3.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
+                className="h-9 px-2.5 xl:px-3.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
                 title="Smart Natural Language Entry"
               >
-                <BrainCircuit size={15} />
-                <span className="hidden sm:inline">Smart Entry</span>
+                <BrainCircuit size={15} className="shrink-0" />
+                <span className="hidden xl:inline">Smart Entry</span>
               </button>
             )}
 
@@ -133,28 +133,28 @@ const Navbar: React.FC<Props> = ({
             <button
               id="btn-scan-receipt-nav"
               onClick={onOpenScanReceipt}
-              className="h-9 px-3 sm:px-3.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
+              className="h-9 px-2.5 xl:px-3.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
               title="Scan Receipt with AI Vision"
             >
-              <Camera size={15} />
-              <span className="hidden sm:inline">AI Scanner</span>
+              <Camera size={15} className="shrink-0" />
+              <span className="hidden xl:inline">AI Scanner</span>
             </button>
 
             <button
               id="btn-add-tx-nav"
               onClick={onOpenAddTransaction}
-              className="h-9 px-3 sm:px-3.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
+              className="h-9 px-2.5 xl:px-3.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
               title="Add New Transaction"
             >
-              <Plus size={15} />
-              <span className="hidden sm:inline">Add Entry</span>
+              <Plus size={15} className="shrink-0" />
+              <span className="hidden xl:inline">Add Entry</span>
             </button>
 
             {/* Profile Dropdown */}
             <div className="relative inline-flex items-center shrink-0">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="h-9 px-2.5 sm:px-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left inline-flex items-center gap-2 max-w-[170px] sm:max-w-[210px]"
+                className="h-9 px-2 sm:px-2.5 xl:px-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left inline-flex items-center gap-1.5 xl:gap-2 max-w-[120px] sm:max-w-[160px] xl:max-w-[210px] shrink-0"
                 title={`Active Wallet: ${activeProfile.name} (${currency.code})`}
               >
                 <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${activeProfile.avatarColor} flex items-center justify-center text-white text-[11px] font-bold shadow-xs shrink-0`}>
