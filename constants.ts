@@ -112,7 +112,8 @@ export const INITIAL_USER = {
   profiles: INITIAL_PROFILES,
   settings: {
     currency: 'TZS',
-    theme: 'dark' as 'light' | 'dark',
+    theme: 'light' as 'light' | 'dark',
+    darkMode: false,
     notifications: true,
     autoCategorize: true,
     showRunwayWarning: true,

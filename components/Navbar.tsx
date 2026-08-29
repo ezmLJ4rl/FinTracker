@@ -83,8 +83,8 @@ const Navbar: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center space-x-0.5 xl:space-x-1 shrink-0">
+          {/* Desktop Nav Links (xl and above) */}
+          <nav className="hidden xl:flex items-center space-x-0.5 2xl:space-x-1 shrink-0">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -93,7 +93,7 @@ const Navbar: React.FC<Props> = ({
                   key={item.id}
                   id={`nav-tab-${item.id}`}
                   onClick={() => setActiveTab(item.id)}
-                  className={`relative flex items-center gap-1.5 xl:gap-2 px-2 xl:px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`relative flex items-center gap-1.5 px-2 2xl:px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     isActive
                       ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60'
@@ -115,17 +115,17 @@ const Navbar: React.FC<Props> = ({
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 2xl:gap-2 shrink-0">
             {/* Smart Natural Words Entry Button */}
             {onOpenSmartEntry && (
               <button
                 id="btn-smart-entry-nav"
                 onClick={onOpenSmartEntry}
-                className="h-9 px-2.5 xl:px-3.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
+                className="h-9 px-2.5 2xl:px-3.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
                 title="Smart Natural Language Entry"
               >
                 <BrainCircuit size={15} className="shrink-0" />
-                <span className="hidden xl:inline">Smart Entry</span>
+                <span className="hidden 2xl:inline">Smart Entry</span>
               </button>
             )}
 
@@ -133,28 +133,28 @@ const Navbar: React.FC<Props> = ({
             <button
               id="btn-scan-receipt-nav"
               onClick={onOpenScanReceipt}
-              className="h-9 px-2.5 xl:px-3.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
+              className="h-9 px-2.5 2xl:px-3.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
               title="Scan Receipt with AI Vision"
             >
               <Camera size={15} className="shrink-0" />
-              <span className="hidden xl:inline">AI Scanner</span>
+              <span className="hidden 2xl:inline">AI Scanner</span>
             </button>
 
             <button
               id="btn-add-tx-nav"
               onClick={onOpenAddTransaction}
-              className="h-9 px-2.5 xl:px-3.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
+              className="h-9 px-2.5 2xl:px-3.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
               title="Add New Transaction"
             >
               <Plus size={15} className="shrink-0" />
-              <span className="hidden xl:inline">Add Entry</span>
+              <span className="hidden 2xl:inline">Add Entry</span>
             </button>
 
             {/* Profile Dropdown */}
             <div className="relative inline-flex items-center shrink-0">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="h-9 px-2 sm:px-2.5 xl:px-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left inline-flex items-center gap-1.5 xl:gap-2 max-w-[120px] sm:max-w-[160px] xl:max-w-[210px] shrink-0"
+                className="h-9 px-2 sm:px-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left inline-flex items-center gap-1.5 max-w-[130px] sm:max-w-[170px] shrink-0"
                 title={`Active Wallet: ${activeProfile.name} (${currency.code})`}
               >
                 <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${activeProfile.avatarColor} flex items-center justify-center text-white text-[11px] font-bold shadow-xs shrink-0`}>
@@ -233,8 +233,8 @@ const Navbar: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Mobile Sub-Navigation Bar */}
-        <div className="lg:hidden flex items-center space-x-1 overflow-x-auto py-2 border-t border-slate-100 dark:border-slate-800 no-scrollbar">
+        {/* Mobile & Tablet Sub-Navigation Bar */}
+        <div className="xl:hidden flex items-center space-x-1 overflow-x-auto py-2 border-t border-slate-100 dark:border-slate-800 no-scrollbar">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;

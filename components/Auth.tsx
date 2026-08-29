@@ -146,8 +146,8 @@ export const Auth: React.FC<Props> = ({ onLogin }) => {
         profiles: [initialProfile],
         settings: {
           currency: currency,
-          theme: 'dark',
-          darkMode: true,
+          theme: 'light',
+          darkMode: false,
           activeProfileId: initialProfile.id,
           language: 'en',
           monthlyBudget: parseFloat(monthlyBudget) || 1500000,

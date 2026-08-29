@@ -34,7 +34,7 @@ export function App() {
   const [categories, setCategories] = useState<CategoryItem[]>(DEFAULT_CATEGORIES);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [loading, setLoading] = useState(true);
-  const [isDark, setIsDark] = useState<boolean>(true);
+  const [isDark, setIsDark] = useState<boolean>(false);
 
   // Modals state
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
@@ -60,7 +60,7 @@ export function App() {
           const userTx = await dbService.getTransactions(foundUser.username);
           setCategories(userCats);
           setTransactions(userTx);
-          setIsDark(foundUser.settings.theme === 'dark' || foundUser.settings.darkMode !== false);
+          setIsDark(foundUser.settings?.theme === 'dark' || foundUser.settings?.darkMode === true);
         }
       }
     } catch (err) {
@@ -86,7 +86,7 @@ export function App() {
   // Handle User Login from Auth Component
   const handleUserLogin = async (loggedInUser: User) => {
     setUser(loggedInUser);
-    setIsDark(loggedInUser.settings.theme === 'dark' || loggedInUser.settings.darkMode !== false);
+    setIsDark(loggedInUser.settings?.theme === 'dark' || loggedInUser.settings?.darkMode === true);
     const userCats = await dbService.getCategories(loggedInUser.username);
     const userTx = await dbService.getTransactions(loggedInUser.username);
     setCategories(userCats);
@@ -397,7 +397,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       {/* Top Application Navbar */}
       <Navbar
         user={user}
