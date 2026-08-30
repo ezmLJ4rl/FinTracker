@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Transaction, CategoryItem } from '../types';
 import { PAYMENT_METHODS } from '../constants';
-import { parseSmartEntryWithAI } from '../services/geminiService';
+import { parseSmartEntry } from '../services/smartService';
 import {
   X,
   Save,
@@ -45,7 +45,7 @@ const TransactionFormModal: React.FC<Props> = ({
   const [notes, setNotes] = useState(initialData?.notes || '');
   const [receipt, setReceipt] = useState<{ name: string; type: string; dataUrl: string } | null>(null);
   const [loading, setLoading] = useState(false);
-  const [quickAiText, setQuickAiText] = useState('');
+  const [quickInputText, setQuickInputText] = useState('');
   const [isQuickParsing, setIsQuickParsing] = useState(false);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const TransactionFormModal: React.FC<Props> = ({
       setIsFixedCost(false);
       setNotes('');
       setReceipt(null);
-      setQuickAiText('');
+      setQuickInputText('');
     }
   }, [initialData, isOpen]);
 
@@ -84,12 +84,12 @@ const TransactionFormModal: React.FC<Props> = ({
 
   if (!isOpen) return null;
 
-  const handleQuickAiAutofill = async () => {
-    if (!quickAiText.trim() || isQuickParsing) return;
+  const handleQuickAutofill = async () => {
+    if (!quickInputText.trim() || isQuickParsing) return;
     setIsQuickParsing(true);
     try {
       const categoryNames = categories.map((c) => c.name);
-      const extracted = await parseSmartEntryWithAI(quickAiText, categoryNames, currencySymbol);
+      const extracted = await parseSmartEntry(quickInputText, categoryNames, currencySymbol);
       if (extracted.length > 0) {
         const item = extracted[0];
         setName(item.name);
@@ -184,19 +184,19 @@ const TransactionFormModal: React.FC<Props> = ({
           </button>
         </div>
 
-        {/* Quick AI Sentence Autofill bar (when creating new) */}
+        {/* Quick Sentence Autofill bar (when creating new) */}
         {!initialData && (
           <div className="px-6 py-3 bg-indigo-50/70 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50">
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
                 <input
                   type="text"
-                  value={quickAiText}
-                  onChange={(e) => setQuickAiText(e.target.value)}
+                  value={quickInputText}
+                  onChange={(e) => setQuickInputText(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
-                      handleQuickAiAutofill();
+                      handleQuickAutofill();
                     }
                   }}
                   placeholder="Type words (e.g. 'Lunch 15,000 KFC with M-Pesa') to autofill..."
@@ -204,8 +204,8 @@ const TransactionFormModal: React.FC<Props> = ({
                 />
                 <button
                   type="button"
-                  onClick={handleQuickAiAutofill}
-                  disabled={!quickAiText.trim() || isQuickParsing}
+                  onClick={handleQuickAutofill}
+                  disabled={!quickInputText.trim() || isQuickParsing}
                   className="absolute right-1 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
                 >
                   {isQuickParsing && <RefreshCw size={11} className="animate-spin" />}

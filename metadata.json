@@ -1,6 +1,6 @@
 {
   "name": "FinTrack Pro",
-  "description": "An AI-driven personal finance auditing platform with smart receipt OCR, pragmatic financial advice, multi-profile tracking, and budget efficiency analytics.",
+  "description": "A comprehensive personal finance auditing and wealth management platform with smart receipt OCR, pragmatic financial advice, multi-profile tracking, and budget efficiency analytics.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Transaction, Profile, DashboardStats, PragmaticInsight } from '../types';
-import { SUGGESTED_AI_PROMPTS } from '../constants';
-import { queryPragmaticAdvisor } from '../services/geminiService';
+import { SUGGESTED_ADVISOR_PROMPTS } from '../constants';
+import { queryFinancialAdvisor } from '../services/smartService';
 import {
   Send,
   RefreshCw,
@@ -98,7 +98,7 @@ const InsightsView: React.FC<Props> = ({
     id: `init-${Date.now()}`,
     timestamp: new Date().toISOString(),
     role: 'assistant',
-    content: `Hello! I am your personal AI Financial Assistant in FinTrack.
+    content: `Hello! I am your personal Financial Assistant in FinTrack.
 
 You can ask me **any question** in plain words — from checking your spending in **${profileName}**, how to save money, and managing loans, to everyday budgeting advice or friendly chat!
 
@@ -168,7 +168,7 @@ How can I assist you today?`,
         keyRecommendations: ['Maintain balanced cash reserves and limit discretionary expenses.'],
       };
 
-      const response = await queryPragmaticAdvisor(
+      const response = await queryFinancialAdvisor(
         q,
         history,
         transactions,
@@ -178,7 +178,7 @@ How can I assist you today?`,
       );
 
       const assistantMsg: PragmaticInsight = {
-        id: `ai-${Date.now()}`,
+        id: `advisor-${Date.now()}`,
         timestamp: new Date().toISOString(),
         role: 'assistant',
         content: response?.rawText || 'I am ready to help you analyze your budget and finances. What would you like to explore next?',
@@ -189,7 +189,7 @@ How can I assist you today?`,
     } catch (err) {
       console.error('Advisor request error:', err);
       const fallbackMsg: PragmaticInsight = {
-        id: `ai-err-${Date.now()}`,
+        id: `advisor-fallback-${Date.now()}`,
         timestamp: new Date().toISOString(),
         role: 'assistant',
         content: `I'm here to help! Based on your active wallet (${profileName}), you have recorded ${formatMoneySafe(totalExpenses, currencySymbol)} in expenses and have ${formatMoneySafe(netBalance, currencySymbol)} remaining. Feel free to ask any other questions!`,
@@ -213,7 +213,7 @@ How can I assist you today?`,
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              AI Money Advisor
+              Money Advisor
             </span>
             <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -221,7 +221,7 @@ How can I assist you today?`,
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2 mt-0.5">
-            <span>Financial AI Assistant</span>
+            <span>Financial Advisor & Assistant</span>
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Ask any question in English or Swahili about your daily spending, budget limits, or saving tips.
@@ -312,7 +312,7 @@ How can I assist you today?`,
           <MessageSquare size={13} className="text-indigo-500" />
           Quick questions:
         </span>
-        {SUGGESTED_AI_PROMPTS.map((p, idx) => (
+        {SUGGESTED_ADVISOR_PROMPTS.map((p, idx) => (
           <button
             key={idx}
             onClick={() => handleSendMessage(p.query)}
@@ -350,7 +350,7 @@ How can I assist you today?`,
                 {msg.role === 'assistant' && (
                   <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/60 dark:border-slate-700/60 text-[11px] text-slate-400">
                     <span className="font-bold text-indigo-600 dark:text-indigo-400">
-                      FinTrack AI Advisor
+                      FinTrack Advisor
                     </span>
                     <span>
                       {new Date(msg.timestamp).toLocaleTimeString([], {

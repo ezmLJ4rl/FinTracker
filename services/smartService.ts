@@ -21,9 +21,9 @@ export interface PragmaticAdvisorResponse {
 }
 
 /**
- * Smart Entry Natural Language Transaction Parser
+ * Natural Language Transaction Parser
  */
-export const parseSmartEntryWithAI = async (
+export const parseSmartEntry = async (
   text: string,
   categories: string[],
   currencySymbol: string
@@ -31,7 +31,7 @@ export const parseSmartEntryWithAI = async (
   const currentDate = new Date().toISOString().split("T")[0];
 
   try {
-    const res = await fetch("/api/gemini/smart-entry", {
+    const res = await fetch("/api/smart-entry/parse", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,13 +54,13 @@ export const parseSmartEntryWithAI = async (
     }
     return parseSmartEntryLocallyClient(text, categories, currentDate);
   } catch (err) {
-    console.warn("Smart entry API error, running local natural language parser:", err);
+    console.warn("Smart entry parser fallback:", err);
     return parseSmartEntryLocallyClient(text, categories, currentDate);
   }
 };
 
 /**
- * Client heuristic fallback parser for Smart Entry
+ * Client heuristic fallback parser
  */
 function parseSmartEntryLocallyClient(text: string, categories: string[], currentDate: string): SmartParsedTransaction[] {
   const lines = text.split(/[\n;]+/).map((l) => l.trim()).filter(Boolean);
@@ -149,7 +149,7 @@ function parseSmartEntryLocallyClient(text: string, categories: string[], curren
       category,
       paymentMethod,
       isFixedCost: category === "Rent & Housing" || category === "Utilities (LUKU & Water)" || isBnpl,
-      notes: `Smart Words Entry: "${line.slice(0, 50)}"`,
+      notes: `Natural Entry: "${line.slice(0, 50)}"`,
     });
   }
 
@@ -166,9 +166,9 @@ function parseSmartEntryLocallyClient(text: string, categories: string[], curren
 }
 
 /**
- * Smart OCR Receipt Scanner calling full-stack backend
+ * Receipt Scanner
  */
-export const scanReceiptWithAI = async (
+export const scanReceipt = async (
   dataUrl: string,
   currencySymbol: string,
   categories: string[]
@@ -176,7 +176,7 @@ export const scanReceiptWithAI = async (
   const defaultDate = new Date().toISOString().split("T")[0];
 
   try {
-    const res = await fetch("/api/gemini/ocr", {
+    const res = await fetch("/api/ocr/scan", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -200,18 +200,18 @@ export const scanReceiptWithAI = async (
       category: categories.includes(data.category) ? data.category : (categories[0] || "Shopping & Groceries"),
       confidence: data.confidence || 95,
       items: Array.isArray(data.items) ? data.items : [],
-      notes: data.notes || "Auto-extracted via Smart OCR",
+      notes: data.notes || "Auto-extracted via Receipt Scanner",
     };
   } catch (err) {
     console.warn("OCR API proxy error, falling back to local extractor:", err);
-    return simulateFastReceiptOCR(dataUrl, defaultDate, categories);
+    return fallbackReceiptExtractor(dataUrl, defaultDate, categories);
   }
 };
 
 /**
- * Client fallback Receipt OCR simulator
+ * Local fallback receipt extractor
  */
-function simulateFastReceiptOCR(dataUrl: string, defaultDate: string, categories: string[]): OCRReceiptResult {
+function fallbackReceiptExtractor(dataUrl: string, defaultDate: string, categories: string[]): OCRReceiptResult {
   const sampleMerchants = [
     { name: "Shoppers Supermarket Mlimani", category: "Shopping & Groceries", base: 45000 },
     { name: "Samaki Samaki Oysterbay", category: "Food & Dining", base: 68000 },
@@ -238,9 +238,9 @@ function simulateFastReceiptOCR(dataUrl: string, defaultDate: string, categories
 }
 
 /**
- * Pragmatic Advisor Chat & Financial Auditing Engine calling backend
+ * Financial Advisor query service
  */
-export const queryPragmaticAdvisor = async (
+export const queryFinancialAdvisor = async (
   query: string,
   conversationHistory: Array<{ role: "user" | "assistant"; content: string }>,
   transactions: Transaction[],
@@ -248,13 +248,11 @@ export const queryPragmaticAdvisor = async (
   profile: Profile,
   efficiencyScore: EfficiencyScore
 ): Promise<PragmaticAdvisorResponse> => {
-  // Aggregate real financial data
   const totalIncome = transactions.filter((t) => t.type === "income").reduce((acc, t) => acc + t.amount, 0);
   const totalExpenses = transactions.filter((t) => t.type === "expense").reduce((acc, t) => acc + t.amount, 0);
   const totalBnpl = transactions.filter((t) => t.type === "bnpl").reduce((acc, t) => acc + t.amount, 0);
   const netBalance = totalIncome - (totalExpenses + totalBnpl);
 
-  // Category breakdown
   const categoryTotals: Record<string, number> = {};
   transactions
     .filter((t) => t.type === "expense" || t.type === "bnpl")
@@ -298,7 +296,7 @@ export const queryPragmaticAdvisor = async (
   };
 
   try {
-    const res = await fetch("/api/gemini/advisor", {
+    const res = await fetch("/api/advisor/query", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -316,17 +314,17 @@ export const queryPragmaticAdvisor = async (
 
     const data = await res.json();
     return {
-      rawText: data.rawText || "Financial audit completed.",
+      rawText: data.rawText || "Financial consultation completed.",
       structured: data.structured || {
-        observation: "Audit generated from your transaction history.",
+        observation: "Review generated from your transaction history.",
         comparison: `Efficiency score: ${efficiencyScore.score}/100.`,
         riskAnalysis: "Maintain consistent budget surveillance across variable categories.",
         actionableStep: "Set category limits and automate savings.",
       },
     };
   } catch (err) {
-    console.warn("Advisor API proxy error, generating client response:", err);
-    return generateLocalPragmaticResponse(
+    console.warn("Advisor API fallback:", err);
+    return generateLocalAdvisorResponse(
       query,
       totalIncome,
       totalExpenses,
@@ -340,9 +338,9 @@ export const queryPragmaticAdvisor = async (
 };
 
 /**
- * Local offline/fallback Pragmatic Advisor Response
+ * Local offline advisor response generator
  */
-function generateLocalPragmaticResponse(
+function generateLocalAdvisorResponse(
   query: string,
   income: number,
   expenses: number,
@@ -356,16 +354,16 @@ function generateLocalPragmaticResponse(
 
   if (isSwahili) {
     const rawText = `
-### 🔍 Uchunguzi (Observation)
+### 🔍 Uchunguzi
 Mapato yako ya jumla ni ${currency} ${income.toLocaleString()} huku matumizi na mikopo ya BNPL ikiwa ${currency} ${(expenses + bnpl).toLocaleString()}. Kiwango chako cha Ufanisi wa Kifedha kipo ${efficiency.score}/100 (${efficiency.title}). Matumizi makuu yako kwenye: ${topCats}.
 
-### 📊 Ulinganisho (Benchmark & Comparison)
+### 📊 Ulinganisho
 Kwa kanuni ya kiuchumi ya 50/30/20, kiwango chako cha uwekezaji na uokoaji kinapaswa kufikia angalau 20%. Hivi sasa, unaokoa takriban ${efficiency.savingsRate.toFixed(1)}% ya mapato yako.
 
-### ⚠️ Uchambuzi wa Hatari (Risk Analysis)
+### ⚠️ Uchambuzi wa Hatari
 Kama mwenendo wa matumizi ya hiari (dining na ununuzi) utaendelea bila kikomo cha kila wiki, akiba ya dharura inaweza kuathirika kabla ya mwezi kuisha.
 
-### 💡 Hatua za Kuchukua (Actionable Steps)
+### 💡 Hatua za Kuchukua
 1. Weka kikomo cha matumizi ya chakula na anasa kisichozidi ${currency} ${Math.round(expenses * 0.25).toLocaleString()} kwa wiki.
 2. Kamilisha malipo ya madeni madogo madogo ya BNPL ili kuepuka tozo za kuchelewa.
 3. Hamisha asilimia 10 ya mapato moja kwa moja kwenye akiba kabla ya kuanza matumizi.

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { User, Profile, UserSettings } from '../types';
-import { ACADEMIC_DISCLAIMER } from '../constants';
 import {
   Moon,
   Sun,
@@ -9,7 +8,6 @@ import {
   Upload,
   RefreshCw,
   Trash2,
-  GraduationCap,
   HelpCircle,
   CheckCircle2,
   Lock,
@@ -235,32 +233,6 @@ const SettingsView: React.FC<Props> = ({
               </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Academic Attribution Footer Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 rounded-3xl text-white border border-slate-800 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-600/30">
-            <GraduationCap size={24} />
-          </div>
-          <div>
-            <h4 className="text-sm font-black tracking-tight text-white">
-              {ACADEMIC_DISCLAIMER.institution}
-            </h4>
-            <p className="text-xs text-indigo-300 font-semibold">
-              {ACADEMIC_DISCLAIMER.faculty} • {ACADEMIC_DISCLAIMER.course} ({ACADEMIC_DISCLAIMER.year})
-            </p>
-            <p className="text-[11px] text-slate-400 mt-1">
-              Supervised by {ACADEMIC_DISCLAIMER.supervisor} • Developed by {ACADEMIC_DISCLAIMER.authors.join(', ')}
-            </p>
-          </div>
-        </div>
-
-        <div className="text-right">
-          <span className="text-[10px] uppercase font-mono font-bold px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-            Final Capstone Architecture
-          </span>
         </div>
       </div>
     </div>

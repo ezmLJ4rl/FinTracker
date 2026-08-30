@@ -168,7 +168,7 @@ export function exportFinancialAuditPDF(
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text('AI-Driven Personal Finance Auditing Platform • IFM CIT 301', 14, 26);
+  doc.text('Personal Finance Auditing & Wealth Management Platform', 14, 26);
   doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString()}`, 14, 33);
 
   doc.setFontSize(12);
@@ -215,11 +215,11 @@ export function exportFinancialAuditPDF(
   doc.setTextColor(71, 85, 105);
   doc.text(`Savings Rate: ${stats.savingsRate.toFixed(1)}% | Fixed: ${stats.efficiencyScore.fixedCostPct.toFixed(0)}% | Variable: ${stats.efficiencyScore.variableCostPct.toFixed(0)}% | BNPL Burden: ${stats.efficiencyScore.bnplBurdenPct.toFixed(1)}%`, 20, 85);
 
-  // AI Pragmatic Recommendations
+  // Financial Auditor Key Recommendations
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 41, 59);
-  doc.text('2. AI Pragmatic Auditor Key Directives', 14, 102);
+  doc.text('2. Financial Auditor Key Directives', 14, 102);
 
   let recY = 110;
   stats.efficiencyScore.keyRecommendations.forEach((rec, idx) => {

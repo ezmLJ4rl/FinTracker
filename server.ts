@@ -9,8 +9,8 @@ const PORT = 3000;
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-// Robust Gemini client and model caller
-function getGeminiClient(): GoogleGenAI | null {
+// Model API client
+function getGenAIClient(): GoogleGenAI | null {
   const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
   if (!apiKey) {
     return null;
@@ -26,15 +26,15 @@ function getGeminiClient(): GoogleGenAI | null {
 }
 
 /**
- * Robust Gemini caller with automatic fallback models
+ * Text and content generation with automatic model fallback
  */
-async function generateContentSafe(ai: GoogleGenAI, contents: any, config?: any) {
+async function executeModelPrompt(client: GoogleGenAI, contents: any, config?: any) {
   const modelsToTry = ["gemini-3.7-flash", "gemini-2.5-flash", "gemini-3.1-flash-lite"];
   let lastError: any = null;
 
   for (const model of modelsToTry) {
     try {
-      const response = await ai.models.generateContent({
+      const response = await client.models.generateContent({
         model,
         contents,
         config,
@@ -43,13 +43,13 @@ async function generateContentSafe(ai: GoogleGenAI, contents: any, config?: any)
         return response;
       }
     } catch (err: any) {
-      console.warn(`Model ${model} failed, trying fallback:`, err?.message || err);
+      console.warn(`Model ${model} request error, trying alternate model:`, err?.message || err);
       lastError = err;
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
   }
 
-  throw lastError || new Error("All Gemini models unavailable");
+  throw lastError || new Error("Model service temporarily unavailable");
 }
 
 // Health check endpoint
@@ -93,8 +93,8 @@ function sanitizeChatContents(history: any[], currentQuery: string) {
   return contents;
 }
 
-// 1. OCR Receipt Scanner Endpoint
-app.post("/api/gemini/ocr", async (req, res) => {
+// 1. OCR Receipt Scanner Handler
+const handleOcrScan = async (req: express.Request, res: express.Response) => {
   try {
     const { dataUrl, categories = [] } = req.body;
     const defaultDate = new Date().toISOString().split("T")[0];
@@ -103,8 +103,8 @@ app.post("/api/gemini/ocr", async (req, res) => {
       return res.status(400).json({ error: "No image provided" });
     }
 
-    const ai = getGeminiClient();
-    if (!ai) {
+    const client = getGenAIClient();
+    if (!client) {
       return res.json(getFallbackOCR(defaultDate, categories));
     }
 
@@ -139,8 +139,8 @@ Return strictly valid JSON:
 }
 `;
 
-    const response = await generateContentSafe(
-      ai,
+    const response = await executeModelPrompt(
+      client,
       [
         {
           role: "user",
@@ -178,15 +178,17 @@ Return strictly valid JSON:
       return res.json(getFallbackOCR(defaultDate, categories));
     }
   } catch (err: any) {
-    console.error("Gemini OCR Error:", err?.message || err);
+    console.error("Receipt Processing Error:", err?.message || err);
     const defaultDate = new Date().toISOString().split("T")[0];
     const { categories = [] } = req.body;
     return res.json(getFallbackOCR(defaultDate, categories));
   }
-});
+};
 
-// 2. Simple AI Advisor Chat Endpoint (Handles ANY query in simple language)
-app.post("/api/gemini/advisor", async (req, res) => {
+app.post("/api/ocr/scan", handleOcrScan);
+
+// 2. Financial Advisor Consultation Handler
+const handleAdvisorQuery = async (req: express.Request, res: express.Response) => {
   try {
     const { query, conversationHistory = [], context = {} } = req.body;
 
@@ -206,7 +208,7 @@ app.post("/api/gemini/advisor", async (req, res) => {
 
     const isSwahili = /habari|mambo|vipi|pesa|matumizi|shilingi|kiswahili|akiba|madeni|tathmini/i.test(query || "");
 
-    const systemInstruction = `You are FinTrack AI, an intelligent, empathetic, and friendly personal money advisor and chatbot.
+    const systemInstruction = `You are FinTrack Advisor, an intelligent, empathetic, and friendly personal money advisor and financial assistant.
 
 Your Core Capabilities:
 1. SIMPLE & CLEAR LANGUAGE: Speak in plain, direct, and conversational words. Avoid overly complex jargon.
@@ -226,15 +228,15 @@ Your Core Capabilities:
    - If the user writes in Swahili (Kiswahili), reply in fluent, natural Swahili.
 5. FORMATTING: Use clean bullet points and bold highlights for key numbers. Keep responses focused and readable.`;
 
-    const ai = getGeminiClient();
-    if (!ai) {
+    const client = getGenAIClient();
+    if (!client) {
       const fallback = getFallbackAdvisorResponse(query, context, isSwahili);
       return res.json(fallback);
     }
 
     const contents = sanitizeChatContents(conversationHistory, query);
 
-    const response = await generateContentSafe(ai, contents, {
+    const response = await executeModelPrompt(client, contents, {
       systemInstruction,
     });
     const rawText = response.text?.trim() || "I am here to help you manage your money easily. What would you like to know?";
@@ -249,15 +251,17 @@ Your Core Capabilities:
       },
     });
   } catch (err: any) {
-    console.error("Gemini Advisor Server Error:", err?.message || err);
+    console.error("Advisor Processing Error:", err?.message || err);
     const { query = "", context = {} } = req.body;
     const isSwahili = /habari|mambo|vipi|pesa|matumizi|shilingi|kiswahili|akiba|madeni|tathmini/i.test(query || "");
     return res.json(getFallbackAdvisorResponse(query, context, isSwahili));
   }
-});
+};
 
-// 3. Smart Entry NLP Endpoint (Transforms natural language text into recorded transactions)
-app.post("/api/gemini/smart-entry", async (req, res) => {
+app.post("/api/advisor/query", handleAdvisorQuery);
+
+// 3. Natural Language Transaction Parser Handler
+const handleSmartEntry = async (req: express.Request, res: express.Response) => {
   try {
     const { text = "", categories = [], currentDate = new Date().toISOString().split("T")[0], currencySymbol = "TSh" } = req.body;
 
@@ -265,8 +269,8 @@ app.post("/api/gemini/smart-entry", async (req, res) => {
       return res.status(400).json({ error: "No text provided for smart entry" });
     }
 
-    const ai = getGeminiClient();
-    if (!ai) {
+    const client = getGenAIClient();
+    if (!client) {
       const parsedFallback = parseSmartEntryLocally(text, categories, currentDate);
       return res.json({ transactions: parsedFallback, count: parsedFallback.length });
     }
@@ -317,8 +321,8 @@ Return STRICT JSON with the structure:
   ]
 }`;
 
-    const response = await generateContentSafe(
-      ai,
+    const response = await executeModelPrompt(
+      client,
       [{ role: "user", parts: [{ text: prompt }] }],
       { responseMimeType: "application/json" }
     );
@@ -336,7 +340,7 @@ Return STRICT JSON with the structure:
         category: item.category || (item.type === "income" ? "Freelance & Projects" : "Food & Dining"),
         paymentMethod: item.paymentMethod || "M-Pesa / Vodacom",
         isFixedCost: Boolean(item.isFixedCost),
-        notes: item.notes || `Added via Smart Natural Entry: "${text.slice(0, 40)}"`,
+        notes: item.notes || `Added via Natural Entry: "${text.slice(0, 40)}"`,
       }));
 
       if (validatedList.length === 0) {
@@ -351,12 +355,14 @@ Return STRICT JSON with the structure:
       return res.json({ transactions: fallbackList, count: fallbackList.length });
     }
   } catch (err: any) {
-    console.error("Gemini Smart Entry Error:", err?.message || err);
+    console.error("Smart Entry Error:", err?.message || err);
     const { text = "", categories = [], currentDate = new Date().toISOString().split("T")[0] } = req.body;
     const fallbackList = parseSmartEntryLocally(text, categories, currentDate);
     return res.json({ transactions: fallbackList, count: fallbackList.length });
   }
-});
+};
+
+app.post("/api/smart-entry/parse", handleSmartEntry);
 
 // Heuristic Natural Language Transaction Extractor (Fallback)
 function parseSmartEntryLocally(text: string, categories: any[], currentDate: string) {
@@ -364,7 +370,6 @@ function parseSmartEntryLocally(text: string, categories: any[], currentDate: st
   const results: any[] = [];
 
   for (const line of lines) {
-    // Detect numbers/amounts (e.g. 50,000 or 50000 or 50k or 1.5m)
     let amount = 0;
     const kMatch = line.match(/(\d+(?:\.\d+)?)\s*k\b/i);
     const mMatch = line.match(/(\d+(?:\.\d+)?)\s*m\b/i);
@@ -383,21 +388,18 @@ function parseSmartEntryLocally(text: string, categories: any[], currentDate: st
     }
 
     if (amount === 0) {
-      // Look for any 3-8 digit number in the text
       const digits = line.match(/\b\d{3,8}\b/);
       if (digits) {
         amount = parseFloat(digits[0]);
       } else {
-        amount = 15000; // default safe fallback
+        amount = 15000;
       }
     }
 
-    // Detect Type
     const isIncome = /salary|mshahara|income|received|earned|freelance|mapato|dividend|deposit|payment from|bonus|allowance/i.test(line);
     const isBnpl = /bnpl|lipa pole|lipa baadaye|mkopo|loan|installment|credit/i.test(line);
     const type = isIncome ? "income" : (isBnpl ? "bnpl" : "expense");
 
-    // Detect Payment Method
     let paymentMethod = "Cash";
     if (/m-pesa|mpesa|vodacom/i.test(line)) paymentMethod = "M-Pesa / Vodacom";
     else if (/airtel|tigo|tigopesa/i.test(line)) paymentMethod = "Tigo Pesa / Airtel Money";
@@ -405,7 +407,6 @@ function parseSmartEntryLocally(text: string, categories: any[], currentDate: st
     else if (/card|visa|mastercard/i.test(line)) paymentMethod = "Bank Card / Visa / MC";
     else if (isBnpl) paymentMethod = "BNPL / Lipa Baadaye";
 
-    // Detect Category
     let category = type === "income" ? "Freelance & Projects" : "Food & Dining";
     if (/lunch|dinner|breakfast|food|restaurant|kfc|pizza|coffee|chai|samaki|chakula|vinywaji|drinks/i.test(line)) {
       category = "Food & Dining";
@@ -426,7 +427,6 @@ function parseSmartEntryLocally(text: string, categories: any[], currentDate: st
       else category = "Freelance & Projects";
     }
 
-    // Clean transaction name
     let cleanName = line
       .replace(/\b(spent|paid|bought|received|earned|got|yesterday|today|juzi|kwa|shilingi|tsh|ksh|\$|k|m)\b/gi, "")
       .replace(/[\d,]+/g, "")
@@ -437,7 +437,6 @@ function parseSmartEntryLocally(text: string, categories: any[], currentDate: st
       cleanName = type === "income" ? "Income Deposit" : `${category} Expense`;
     }
 
-    // Relative date handling
     let date = currentDate;
     if (/yesterday|jana/i.test(line)) {
       const d = new Date(currentDate);
@@ -457,7 +456,7 @@ function parseSmartEntryLocally(text: string, categories: any[], currentDate: st
       category,
       paymentMethod,
       isFixedCost: category === "Rent & Housing" || category === "Utilities (LUKU & Water)" || isBnpl,
-      notes: `Recorded via Smart Words: "${line.slice(0, 50)}"`,
+      notes: `Natural entry: "${line.slice(0, 50)}"`,
     });
   }
 
@@ -473,7 +472,7 @@ function parseSmartEntryLocally(text: string, categories: any[], currentDate: st
   }];
 }
 
-// Helper Fallbacks
+// Fallback handlers
 function getFallbackOCR(defaultDate: string, categories: string[]) {
   const sampleMerchants = [
     { name: "Shoppers Supermarket", category: "Shopping & Groceries", base: 45000 },
@@ -515,7 +514,7 @@ function getFallbackAdvisorResponse(query: string, ctx: any, isSwahili: boolean)
   if (isGreeting) {
     if (isSwahili) {
       return {
-        rawText: `Habari! Mimi ni msaidizi wako wa AI. Unaweza kuniuliza swali lolote kuhusu matumizi yako, jinsi ya kuweka akiba, au maongezi ya kawaida. Nikusaidie nini leo?`,
+        rawText: `Habari! Mimi ni msaidizi wako wa kifedha. Unaweza kuniuliza swali lolote kuhusu matumizi yako, jinsi ya kuweka akiba, au maongezi ya kawaida. Nikusaidie nini leo?`,
         structured: {
           observation: "Tayari kukusaidia.",
           comparison: `Alama ya pesa: ${efficiencyScore}/100`,
@@ -525,7 +524,7 @@ function getFallbackAdvisorResponse(query: string, ctx: any, isSwahili: boolean)
       };
     }
     return {
-      rawText: `Hello! I am your AI assistant. You can ask me anything about your spending, how to save more money, or any general question. How can I help you today?`,
+      rawText: `Hello! I am your financial assistant. You can ask me anything about your spending, how to save more money, or any general question. How can I help you today?`,
       structured: {
         observation: "Ready to assist you.",
         comparison: `Money Score: ${efficiencyScore}/100`,

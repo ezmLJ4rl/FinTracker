@@ -67,7 +67,7 @@ export const INITIAL_PROFILES: Profile[] = [
   },
 ];
 
-export const SUGGESTED_AI_PROMPTS = [
+export const SUGGESTED_ADVISOR_PROMPTS = [
   {
     title: '🍔 Check food spending',
     query: 'How much am I spending on food and dining? Is it too high?',
@@ -94,15 +94,6 @@ export const SUGGESTED_AI_PROMPTS = [
     icon: 'Languages',
   },
 ];
-
-export const ACADEMIC_DISCLAIMER = {
-  institution: 'Institute of Finance Management (IFM)',
-  faculty: 'Faculty of Computing, Information Systems and Mathematics',
-  course: 'BSc. in Information Technology / Computer Science Capstone',
-  year: '2025/2026',
-  supervisor: 'Department Academic Supervisor',
-  authors: ['FinTrack Pro Capstone Research Group'],
-};
 
 export const INITIAL_USER = {
   id: 'usr-default',

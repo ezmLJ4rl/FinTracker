@@ -244,7 +244,7 @@ class DatabaseService {
 
     return {
       version: 1,
-      app: 'FinTrack Pro IFM Capstone',
+      app: 'FinTrack Pro',
       exportedAt: new Date().toISOString(),
       users: users.length > 0 ? users : [INITIAL_USER],
       transactions,

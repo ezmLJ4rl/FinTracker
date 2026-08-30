@@ -109,7 +109,7 @@ const TransactionsView: React.FC<Props> = ({
             className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/25 transition-all hover:scale-[1.02] flex items-center gap-1.5 cursor-pointer"
           >
             <Camera size={15} />
-            <span>AI Receipt Scanner</span>
+            <span>Receipt Scanner</span>
           </button>
           <button
             onClick={onOpenAddTransaction}

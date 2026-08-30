@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CategoryItem, SmartParsedTransaction } from '../types';
 import { PAYMENT_METHODS } from '../constants';
-import { parseSmartEntryWithAI } from '../services/geminiService';
+import { parseSmartEntry } from '../services/smartService';
 import {
   X,
   CheckCircle2,
@@ -116,7 +116,7 @@ const SmartEntryModal: React.FC<Props> = ({
     }
   };
 
-  // Trigger AI NLP parsing
+  // Parse natural language text
   const handleParseText = async (textToParse?: string) => {
     const text = (textToParse || inputText).trim();
     if (!text || isParsing) return;
@@ -126,7 +126,7 @@ const SmartEntryModal: React.FC<Props> = ({
 
     try {
       const categoryNames = categories.map((c) => c.name);
-      const results = await parseSmartEntryWithAI(text, categoryNames, currencySymbol);
+      const results = await parseSmartEntry(text, categoryNames, currencySymbol);
       setParsedItems(results);
     } catch (err) {
       console.error('Smart entry parse error:', err);
@@ -212,11 +212,11 @@ const SmartEntryModal: React.FC<Props> = ({
               <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 Smart Natural Entry
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
-                  AI Text Parser
+                  Smart Text Parser
                 </span>
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Type or speak sentences in plain words — AI extracts and records transactions instantly
+                Type or speak sentences in plain words — extracts and records transactions instantly
               </p>
             </div>
           </div>
@@ -283,7 +283,7 @@ const SmartEntryModal: React.FC<Props> = ({
                   </>
                 ) : (
                   <>
-                    <span>Extract with AI</span>
+                    <span>Extract Transactions</span>
                   </>
                 )}
               </button>

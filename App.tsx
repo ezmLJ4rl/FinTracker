@@ -14,6 +14,7 @@ import { CURRENCIES, INITIAL_USER, DEFAULT_CATEGORIES, INITIAL_PROFILES } from '
 
 import Auth from './components/Auth';
 import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
 import DashboardView from './components/DashboardView';
 import TransactionsView from './components/TransactionsView';
 import StatisticsView from './components/StatisticsView';
@@ -43,6 +44,7 @@ export function App() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
   const [viewingReceipt, setViewingReceipt] = useState<Receipt | null>(null);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Initial Data & Session Bootstrapping
   const bootstrapSession = useCallback(async () => {
@@ -359,7 +361,7 @@ export function App() {
   // Reset Demo Data
   const handleResetDemoData = async () => {
     if (!user) return;
-    if (confirm('Reset FinTrack Pro with standard IFM Capstone demo records?')) {
+    if (confirm('Reset FinTrack Pro with standard sample demo records?')) {
       await dbService.clearAllDataForUser(user.username);
       await dbService.seedDemoDataIfEmpty(user);
       const userTx = await dbService.getTransactions(user.username);
@@ -398,8 +400,8 @@ export function App() {
 
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-      {/* Top Application Navbar */}
-      <Navbar
+      {/* Sidebar Navigation */}
+      <Sidebar
         user={user}
         activeProfile={activeProfile}
         activeTab={activeTab}
@@ -415,10 +417,27 @@ export function App() {
         onOpenSmartEntry={() => setIsSmartEntryModalOpen(true)}
         onSwitchProfile={handleSwitchProfile}
         onOpenTutorial={() => setIsTutorialOpen(true)}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
-      {/* Main App Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Main Layout Area offset by Sidebar width on desktop */}
+      <div className="flex-1 flex flex-col lg:pl-64 w-full min-w-0 transition-all duration-300">
+        {/* Top Application Navbar */}
+        <Navbar
+          user={user}
+          activeProfile={activeProfile}
+          activeTab={activeTab}
+          isDark={isDark}
+          onToggleTheme={handleToggleTheme}
+          onLogout={handleLogout}
+          onSwitchProfile={handleSwitchProfile}
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          onNavigateTab={setActiveTab}
+        />
+
+        {/* Main App Container */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'dashboard' && (
           <DashboardView
             user={user}
@@ -560,6 +579,7 @@ export function App() {
         isOpen={isTutorialOpen}
         onClose={() => setIsTutorialOpen(false)}
       />
+      </div>
     </div>
   );
 }

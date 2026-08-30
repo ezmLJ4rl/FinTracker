@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { scanReceiptWithAI, OCRReceiptResult } from '../services/geminiService';
+import { scanReceipt, OCRReceiptResult } from '../services/smartService';
 import { CategoryItem } from '../types';
 import {
   Camera,
@@ -67,18 +67,18 @@ const ReceiptScannerModal: React.FC<Props> = ({
       if (event.target?.result) {
         const url = event.target.result as string;
         setImageSrc(url);
-        triggerAIOCR(url);
+        triggerReceiptScan(url);
       }
     };
     reader.readAsDataURL(file);
   };
 
-  const triggerAIOCR = async (url: string) => {
+  const triggerReceiptScan = async (url: string) => {
     setScanning(true);
     setOcrResult(null);
     try {
       const categoryNames = categories.map(c => c.name);
-      const res = await scanReceiptWithAI(url, currencySymbol, categoryNames);
+      const res = await scanReceipt(url, currencySymbol, categoryNames);
       setOcrResult(res);
       setEditableMerchant(res.merchant);
       setEditableAmount(res.total.toString());
@@ -115,7 +115,7 @@ const ReceiptScannerModal: React.FC<Props> = ({
           type: 'expense',
           paymentMethod: editablePaymentMethod,
           isFixedCost: false,
-          notes: ocrResult?.notes ? `[AI OCR] ${ocrResult.notes}` : 'Extracted via Smart AI Scanner',
+          notes: ocrResult?.notes ? `[OCR] ${ocrResult.notes}` : 'Extracted via Smart Scanner',
         },
         imageSrc
           ? {
@@ -364,7 +364,7 @@ const ReceiptScannerModal: React.FC<Props> = ({
           {imageSrc && (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => triggerAIOCR(imageSrc)}
+                onClick={() => triggerReceiptScan(imageSrc)}
                 disabled={scanning}
                 className="px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors flex items-center gap-1.5"
               >

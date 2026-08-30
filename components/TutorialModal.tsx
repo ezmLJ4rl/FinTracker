@@ -24,12 +24,12 @@ const TutorialModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const steps = [
     {
       title: 'Welcome to FinTrack Pro',
-      subtitle: 'Third-Year Capstone Project • IFM Faculty of Informatics',
+      subtitle: 'Personal Finance Auditing & Wealth Management Platform',
       badge: 'Overview',
       icon: ShieldCheck,
       iconColor: 'from-indigo-600 to-violet-600',
       description:
-        'FinTrack Pro is an AI-driven personal finance auditing platform designed to convert raw transactional chaos into rigorous, actionable financial discipline without ever sending private data to an external server.',
+        'FinTrack Pro is a personal finance auditing platform designed to convert raw transactional chaos into rigorous, actionable financial discipline without ever sending private data to an external server.',
       highlights: [
         '100% Client-Side Privacy: IndexedDB client vault',
         'Built for East African & global currencies (TZS, USD, KES)',
@@ -37,13 +37,13 @@ const TutorialModal: React.FC<Props> = ({ isOpen, onClose }) => {
       ],
     },
     {
-      title: 'Smart AI Receipt Scanner',
+      title: 'Smart Receipt Scanner',
       subtitle: 'From 90 seconds to under 2 seconds entry time',
       badge: 'Speed & OCR',
       icon: Camera,
       iconColor: 'from-emerald-500 to-teal-600',
       description:
-        'Capture or upload supermarket receipts, fuel tokens, restaurant bills, or utility tokens. The integrated AI OCR vision extracts the merchant, total, date, and categorizes the transaction instantly.',
+        'Capture or upload supermarket receipts, fuel tokens, restaurant bills, or utility tokens. The integrated OCR vision extracts the merchant, total, date, and categorizes the transaction instantly.',
       highlights: [
         'Automatic VAT, line items & confidence scoring',
         'Immediate manual review before saving to ledger',
@@ -66,12 +66,12 @@ const TutorialModal: React.FC<Props> = ({ isOpen, onClose }) => {
     },
     {
       title: 'The Pragmatic Advisor',
-      subtitle: 'Structured 4-part AI financial consulting & Swahili support',
-      badge: 'AI Intelligence',
+      subtitle: 'Structured 4-part financial consulting & Swahili support',
+      badge: 'Advisory',
       icon: BrainCircuit,
       iconColor: 'from-violet-600 to-fuchsia-600',
       description:
-        'Consult your personalized financial auditor. Every AI response is strictly structured into Observation, Benchmark Comparison, Risk Analysis, and Actionable Next Steps.',
+        'Consult your personalized financial auditor. Every response is strictly structured into Observation, Benchmark Comparison, Risk Analysis, and Actionable Next Steps.',
       highlights: [
         'Bilingual: Full English and fluent Kiswahili auditing',
         'One-click prompt suggestions for dining, debt, and runaway pace',
